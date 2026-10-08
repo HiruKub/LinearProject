@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-st.set_page_config(page_title="เบาก็หวาน งานก็เยอะ", layout="centered")
+st.set_page_config(page_title="เบาก็หวาน งานก็เยอะ🥶", layout="centered")
 
 
 class DiabetesNN(nn.Module):
@@ -31,11 +31,11 @@ def load_trained_model():
 
 model, mean, std, features = load_trained_model()
 
-st.title("เบาหวาน.AI.Here")
+st.title("เบาหวาน.AI.Here ദ്ദി(˵ •̀ ᴗ - ˵ ) ✧")
 st.caption(f"จริงจังไม่จริงโจ้ สั่งโกโก้ ได้ โอวัลติน \n\n หนักไม่เอา เบาไม่หวาน")
 
 sample_cases = {
-    "อยากเขียนเอง? เอาเลย (Custom Input)": None,
+    "มีข้อมูลอยู่แล้ว? เอาเลยยย (Custom Input)": None,
     "1: Row 1 High risk case (Glucose 148, BloodPressure 72, BMI 33.6, Age 50)": [
         148.0,
         72.0,
@@ -99,7 +99,7 @@ sample_cases = {
         29.0,
         0.134,
     ],
-    "10: Normal case (Glucose 110, BloodPressure 92, BMI 37.6, Age 30)": [
+    "10: Row 11 Normal case (Glucose 110, BloodPressure 92, BMI 37.6, Age 30)": [
         110.0,
         92.0,
         37.6,
@@ -128,56 +128,115 @@ else:
         0.35,
     )
 
+dpf_case = {
+    "custom": None,
+    "ไม่มีคนในครอบครัวเป็นเบาหวานเลย": 0.15,
+    "มีญาติห่างๆ เป็น (เช่น ลุง ป้า น้า อา)": 0.35,
+    "มีคนในครอบครัวสายตรงเป็น (พ่อ แม่ หรือพี่น้อง)": 0.65,
+    "มีทั้งพ่อ แม่ และญาติสายตรงหลายคนเป็น": 1.20,
+}
+
 st.subheader("ใส่ข้อมูลสุขภาพ")
-col1,col2 = st.columns(2)
-with col1:
-    glucose = st.number_input("ระดับน้ำตาลในเลือด (Glucose, mg/dL):", min_value=50.0, max_value=300.0, value=float(default_glucose))
-    bp = st.number_input("ความดันโลหิต (Blood Pressure, mmHg):", min_value=30.0, max_value=200.0, value=float(default_bp))
-    bmi = st.number_input("ดัชนีมวลกาย (BMI, kg/m²):", min_value=10.0, max_value=70.0, value=float(default_bmi))
+with st.container(border=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        glucose = st.number_input(
+            "ระดับน้ำตาลในเลือด (Glucose, mg/dL):",
+            min_value=50.0,
+            max_value=300.0,
+            value=float(default_glucose),
+        )
+        bp = st.number_input(
+            "ความดันโลหิต (Blood Pressure, mmHg):",
+            min_value=30.0,
+            max_value=200.0,
+            value=float(default_bp),
+        )
+        bmi = st.number_input(
+            "ดัชนีมวลกาย (BMI, kg/m²):",
+            min_value=10.0,
+            max_value=70.0,
+            value=float(default_bmi),
+        )
 
-with col2:
-    age = st.number_input("อายุ (Age, ปี):", min_value=1.0, max_value=120.0, value=float(default_age))
-    dpf = st.number_input("ประวัติกรรมพันธุ์ (Diabetes Pedigree Function):", min_value=0.01, max_value=3.0, value=float(default_dpf), format="%.3f")
-    st.caption("ค่าเฉลี่ยคนทั่วไปอยู่ที่ประมาณ 0.35 - 0.50")
+    with col2:
+        age = st.number_input(
+            "อายุ (Age, ปี):", min_value=1.0, max_value=120.0, value=float(default_age)
+        )
+        dpf_title = "ประวัติกรรมพันธุ์ (Diabetes Pedigree Function):"
+        if sample_cases[selected_case] == None:
+            dpf_selected = st.selectbox(dpf_title,list(dpf_case.keys()))
+            if dpf_case[dpf_selected] != None:
+                default_dpf = dpf_case[dpf_selected]
+                dpf_title = "ค่าประวัติกรรมพันธุ์"
+            else:dpf_title = "ใส่ค่าประวัติกรรมพันธุ์ได้เลย"
+        
+        dpf = st.number_input(
+            dpf_title,
+            min_value=0.01,
+            max_value=3.0,
+            value=float(default_dpf),
+            format="%.3f",
+        )
+        st.caption("ค่าเฉลี่ยคนทั่วไปอยู่ที่ประมาณ 0.35 - 0.50")
 
-# prediction button
-if st.button("ประเมินความเสี่ยง (Run Prediction)", type="primary", use_container_width=True):
-    # Input Vector X (1 x 5)
-    input_vector = torch.tensor([[glucose, bp, bmi, age, dpf]], dtype=torch.float32)
+    # prediction button
+    if st.button(
+        "ประเมินความเสี่ยง (Run Prediction)", type="primary", use_container_width=True
+    ):
+        # Input Vector X (1 x 5)
+        input_vector = torch.tensor([[glucose, bp, bmi, age, dpf]], dtype=torch.float32)
 
-    # Standardization
-    normalized_vector = (input_vector - mean) / std
+        # Standardization
+        normalized_vector = (input_vector - mean) / std
 
-    # Sent to Model
-    with torch.no_grad():
-        prediction = model(normalized_vector)
-        risk_prob = prediction.item() * 100  # แปลงเป็นเปอร์เซ็นต์
+        # Sent to Model
+        with torch.no_grad():
+            z1 = model.model[0](normalized_vector)
+            prediction = model(normalized_vector)
+            risk_prob = prediction.item() * 100  # scale to percent
 
-    st.divider()
+        st.divider()
 
-    # display
-    st.subheader("ผลการประเมินความเสี่ยง")
-    if risk_prob >= 50.0:
-        st.error(f"**มีความเสี่ยงเป็นโรคเบาหวาน: {risk_prob:.2f}%**")
-        st.write("คำแนะนำ: ควรปรึกษาแพทย์เพื่อตรวจระดับน้ำตาลอย่างละเอียด และปรับพฤติกรรมการรับประทานอาหาร")                                                                                                                                       
-    else:
-        st.success(f"**ความเสี่ยงต่ำ (อยู่ในเกณฑ์ปกติ): {risk_prob:.2f}%**")
-        st.write("คำแนะนำ: รักษาสุขภาพและออกกำลังกายอย่างสม่ำเสมอนะจ้ะะะะะ")                                                                                                                                                                          
+        # display
+        st.subheader("ผลการประเมินความเสี่ยง")
+        if risk_prob >= 50.0:
+            st.error(f"**มีความเสี่ยงเป็นโรคเบาหวาน: {risk_prob:.2f}%**")
+            st.write(
+                "คำแนะนำ: ควรปรึกษาแพทย์เพื่อตรวจระดับน้ำตาลอย่างละเอียด และปรับพฤติกรรมการรับประทานอาหาร"
+            )
+        else:
+            st.success(f"**ความเสี่ยงต่ำ (อยู่ในเกณฑ์ปกติ): {risk_prob:.2f}%**")
+            st.write("คำแนะนำ: รักษาสุขภาพและออกกำลังกายอย่างสม่ำเสมอนะจ้ะะะะะ")
 
-    # 5. show calculate Linear Algebra
-    with st.expander("ดูเบื้องหลังการคำนวณทางคณิตศาสตร์ (Linear Algebra Detail)"):
-        st.markdown("**1. Input Vector (เวกเตอร์ข้อมูลดิบ) $\\mathbf{x} \\in \\mathbb{R}^{1 \\times 5}$:**")
-        st.write(input_vector.numpy())
+        # 5. show calculate Linear Algebra
+        with st.expander("ดูเบื้องหลังการคำนวณทางคณิตศาสตร์ (Linear Algebra Detail)"):
+            st.markdown(
+                "**1. Input Vector (เวกเตอร์ข้อมูลดิบ) $\\mathbf{x} \\in \\mathbb{R}^{1 \\times 5}$:**"
+            )
+            st.write(input_vector.numpy())
 
-        st.markdown("**2. Normalized Vector (หลังลบ $\\boldsymbol{\\mu}$ หาร $\\boldsymbol{\\sigma}$):**")
-        st.write(normalized_vector.numpy())
+            st.markdown(
+                "**2. Normalized Vector (หลังลบ $\\boldsymbol{\\mu}$ หาร $\\boldsymbol{\\sigma}$):**"
+            )
+            st.write(normalized_vector.numpy())
 
-        st.markdown("**3. Weight Matrix $W_1$ ขนาด $5 \\times 5$ ค่า $b_1$ (Layer 1):**")
-        st.write(model.model[0].weight.data.numpy())
-        st.write(model.model[0].bias.data.numpy())
+            st.markdown(
+                "**3. Weight Matrix $W_1$ ขนาด $5 \\times 5$ ค่า $b_1$ และ $z_1$ (Layer 1):**"
+            )
+            st.write("$W_1$",model.model[0].weight.data.numpy())
+            st.write("$b_1$",model.model[0].bias.data.numpy())
+            st.write("$z_1$",z1.numpy())
 
-        st.markdown("**4. Output Layer $W_2$ ขนาด $1 \\times 5$ ค่า $b_2$ และค่า Sigmoid:**")
-        st.write(model.model[2].weight.data.numpy())
-        st.write(model.model[2].bias.data.numpy())
-        st.write(f"ผลลัพธ์ก่อนเข้า Sigmoid ($z_2$) = {torch.logit(prediction).item():.4f}")
-        st.write("ผลลัพธ์หลัง Sigmoid ($\hat{y} = \sigma(z_2)$) =", f"{prediction.item():.4f}")
+            st.markdown(
+                "**4. Output Layer $W_2$ ขนาด $1 \\times 5$ ค่า $b_2$ และค่า Sigmoid:**"
+            )
+            st.write("$W_2$",model.model[2].weight.data.numpy())
+            st.write("$b_2$",model.model[2].bias.data.numpy())
+            st.write(
+                f"ผลลัพธ์ก่อนเข้า Sigmoid ($z_2$) = {torch.logit(prediction).item():.4f}"
+            )
+            st.write(
+                "ผลลัพธ์หลัง Sigmoid ($\hat{y} = \sigma(z_2)$) =",
+                f"{prediction.item():.4f}",
+            )
