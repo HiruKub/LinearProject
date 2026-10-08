@@ -31,67 +31,68 @@ def load_trained_model():
 
 model, mean, std, features = load_trained_model()
 
-st.title("Diabetes Check? eiei")
+st.title("เบาหวาน.AI.Here")
+st.caption(f"จริงจังไม่จริงโจ้ สั่งโกโก้ ได้ โอวัลติน \n\n หนักไม่เอา เบาไม่หวาน")
 
 sample_cases = {
     "อยากเขียนเอง? เอาเลย (Custom Input)": None,
-    "1: High risk case (Glucose 148, BloodPressure 72, BMI 33.6, Age 50)": [
+    "1: Row 1 High risk case (Glucose 148, BloodPressure 72, BMI 33.6, Age 50)": [
         148.0,
         72.0,
         33.6,
         50.0,
         0.627,
     ],
-    "2: High risk case (Glucose 183, BloodPressure 64, BMI 23.3, Age 32)": [
+    "2: Row 3 High risk case (Glucose 183, BloodPressure 64, BMI 23.3, Age 32)": [
         183.0,
         64.0,
         23.3,
         32.0,
         0.672,
     ],
-    "3: High risk case (Glucose 137, BloodPressure 40, BMI 43.1, Age 33)": [
+    "3: Row 5 High risk case (Glucose 137, BloodPressure 40, BMI 43.1, Age 33)": [
         137.0,
         40.0,
         43.1,
         33.0,
         2.288,
     ],
-    "4: High risk case (Glucose 197, BloodPressure 70, BMI 30.5, Age 53)": [
+    "4: Row 9 High risk case (Glucose 197, BloodPressure 70, BMI 30.5, Age 53)": [
         197.0,
         70.0,
         30.5,
         53.0,
         0.158,
     ],
-    "5: risk case (Glucose 78, BloodPressure 50, BMI 31.0, Age 26)": [
+    "5: Row 7 risk case (Glucose 78, BloodPressure 50, BMI 31.0, Age 26)": [
         78.0,
         50.0,
         31.0,
         26.0,
         0.248,
     ],
-    "6: Normal case (Glucose 85, BloodPressure 66, BMI 26.6, Age 31)": [
+    "6: Row 2 Normal case (Glucose 85, BloodPressure 66, BMI 26.6, Age 31)": [
         85.0,
         66.0,
         26.6,
         31.0,
         0.351,
     ],
-    "7: Normal case (Glucose 89, BloodPressure 66, BMI 28.1, Age 21)": [
+    "7: Row 4 Normal case (Glucose 89, BloodPressure 66, BMI 28.1, Age 21)": [
         89.0,
         66.0,
         28.1,
         21.0,
         0.167,
     ],
-    "8: Normal case (Glucose 116, BloodPressure 74, BMI 25.6, Age 30)": [
+    "8: Row 6 Normal case (Glucose 116, BloodPressure 74, BMI 25.6, Age 30)": [
         116.0,
         74.0,
         25.6,
         30.0,
         0.201,
     ],
-    "9: Normal case (Glucose 115, BloodPressure 70, BMI 35.3, Age 29)": [
+    "9: Row 8 Normal case (Glucose 115, BloodPressure 70, BMI 35.3, Age 29)": [
         115.0,
         70.0,
         35.3,
@@ -158,10 +159,10 @@ if st.button("ประเมินความเสี่ยง (Run Predictio
     st.subheader("ผลการประเมินความเสี่ยง")
     if risk_prob >= 50.0:
         st.error(f"**มีความเสี่ยงเป็นโรคเบาหวาน: {risk_prob:.2f}%**")
-        st.info("คำแนะนำ: ควรปรึกษาแพทย์เพื่อตรวจระดับน้ำตาลอย่างละเอียด และปรับพฤติกรรมการรับประทานอาหาร")                                                                                                                                       
+        st.write("คำแนะนำ: ควรปรึกษาแพทย์เพื่อตรวจระดับน้ำตาลอย่างละเอียด และปรับพฤติกรรมการรับประทานอาหาร")                                                                                                                                       
     else:
         st.success(f"**ความเสี่ยงต่ำ (อยู่ในเกณฑ์ปกติ): {risk_prob:.2f}%**")
-        st.info("คำแนะนำ: รักษาสุขภาพและออกกำลังกายอย่างสม่ำเสมอนะจ้ะะะะะ")                                                                                                                                                                          
+        st.write("คำแนะนำ: รักษาสุขภาพและออกกำลังกายอย่างสม่ำเสมอนะจ้ะะะะะ")                                                                                                                                                                          
 
     # 5. show calculate Linear Algebra
     with st.expander("ดูเบื้องหลังการคำนวณทางคณิตศาสตร์ (Linear Algebra Detail)"):
@@ -171,9 +172,12 @@ if st.button("ประเมินความเสี่ยง (Run Predictio
         st.markdown("**2. Normalized Vector (หลังลบ $\\boldsymbol{\\mu}$ หาร $\\boldsymbol{\\sigma}$):**")
         st.write(normalized_vector.numpy())
 
-        st.markdown("**3. Weight Matrix $W_1$ ขนาด $5 \\times 5$ (Layer 1):**")
+        st.markdown("**3. Weight Matrix $W_1$ ขนาด $5 \\times 5$ ค่า $b_1$ (Layer 1):**")
         st.write(model.model[0].weight.data.numpy())
+        st.write(model.model[0].bias.data.numpy())
 
-        st.markdown("**4. Output Layer $W_2$ ขนาด $1 \\times 5$ และค่า Sigmoid:**")
+        st.markdown("**4. Output Layer $W_2$ ขนาด $1 \\times 5$ ค่า $b_2$ และค่า Sigmoid:**")
+        st.write(model.model[2].weight.data.numpy())
+        st.write(model.model[2].bias.data.numpy())
         st.write(f"ผลลัพธ์ก่อนเข้า Sigmoid ($z_2$) = {torch.logit(prediction).item():.4f}")
         st.write("ผลลัพธ์หลัง Sigmoid ($\hat{y} = \sigma(z_2)$) =", f"{prediction.item():.4f}")
