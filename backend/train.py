@@ -40,7 +40,7 @@ x_train = (x_train - mean) / std
 x_test = (x_test - mean) / std
 
 nodes = 5
-class DiavetesNN(nn.Module):
+class DiabetesNN(nn.Module):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(
@@ -54,7 +54,7 @@ class DiavetesNN(nn.Module):
         return self.model(x)
 
 
-model = DiavetesNN()
+model = DiabetesNN()
 
 criterion = nn.BCELoss() #create criterion
 optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.01)
