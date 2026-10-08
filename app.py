@@ -64,7 +64,7 @@ sample_cases = {
         53.0,
         0.158,
     ],
-    "5: Row 7 risk case (Glucose 78, BloodPressure 50, BMI 31.0, Age 26)": [
+    "5: Row 7 risk case (Glucose 78, BloodPressure 50, BMI 31.0, Age 26) False Negative": [
         78.0,
         50.0,
         31.0,
@@ -161,7 +161,8 @@ with st.container(border=True):
 
     with col2:
         age = st.number_input(
-            "อายุ (Age, ปี):", min_value=1.0, max_value=120.0, value=float(default_age)
+            # "อายุ (Age, ปี):", min_value=1.0, max_value=120.0, value=float(default_age)
+            "อายุ (Age, ปี):", min_value=1, max_value=120, value=int(default_age)
         )
         dpf_title = "ประวัติกรรมพันธุ์ (Diabetes Pedigree Function):"
         if sample_cases[selected_case] == None:
