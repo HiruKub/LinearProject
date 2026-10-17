@@ -3,6 +3,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import matplotlib.pyplot as plt
 
 csv_file = pd.read_csv("data/diabetes.csv")
 
@@ -58,7 +59,7 @@ model = DiabetesNN()
 
 criterion = nn.BCELoss() #create criterion
 optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.01)
-
+loss_history = []
 epochs = 1000
 for epoch in range(epochs):
     # forward pass
@@ -74,9 +75,21 @@ for epoch in range(epochs):
 
     # scaling weight and bias
     optimizer.step()
+    
+    loss_history.append(loss_fn.item())
 
     if (epoch + 1) % 20 == 0:
         print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss_fn.item():.4f}")
+        
+plt.figure(figsize=(8, 5))
+plt.plot(loss_history, label="Training Loss", color="blue")
+plt.title("Loss Curve during Training (Linear Algebra Project)")
+plt.xlabel("Epochs")
+plt.ylabel("Loss (BCELoss)")
+plt.grid(True)
+plt.legend()
+plt.savefig("loss_curve.png")  # บันทึกเป็นไฟล์รูปภาพเอาไปแปะในเล่มได้เลย!
+plt.show()
 
 with torch.no_grad():
     y_predict_test = model(x_test)
